@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { useContext } from 'react';
@@ -7,6 +7,15 @@ import AuthContext from '../../contexts/AuthContext';
 import * as Yup from 'yup';
 import axios from 'axios';
 import routes from '../../utils/routes'
+
+const INPUT_LENGTHS = {
+    username: 3,
+    password: 4,
+}
+const ERRORS_MESSAGES = {
+    usernameMinLength: `Имя должно содержать минимум ${INPUT_LENGTHS.username}`,
+    passwordMinLength: `Пароль должен содержать минимум ${INPUT_LENGTHS.password}`
+}
 
 const LoginPage = () => {
     const [errorMessage, setErrorMessage] = useState(null);
@@ -29,11 +38,11 @@ const LoginPage = () => {
                     const status = await response.data.error;
                     throw new Error(status);
                 }
-                const token = await response.data;
-                logIn({ ...userData, token })
+                logIn({ username: userData.username })
                 navigate('/');
             } catch (e) {
-                setErrorMessage(e.response.statusText)
+                const message = e.response.statusText === 'Unauthorized' ? 'Неверный логин или пароль' : 'Неизвестная ошибка'
+                setErrorMessage(message)
                 throw e;
             }
 
@@ -41,11 +50,11 @@ const LoginPage = () => {
         validationSchema: Yup.object({
             username: Yup
                 .string()
-                .min(3, 'Логин должен содержать минимум 3 символа')
+                .min(INPUT_LENGTHS.username, ERRORS_MESSAGES.usernameMinLength)
                 .required('Обязательное поле'),
             password: Yup
                 .string()
-                .min(4, 'Пароль должен содержать минимум 4 символа')
+                .min(INPUT_LENGTHS.password, ERRORS_MESSAGES.passwordMinLength)
                 .required('Обязательное поле')
         })
     })
@@ -53,43 +62,49 @@ const LoginPage = () => {
     return (
         <>
             <Container>
-                <h1 className='text-center'> Войти</h1>
-                <Form
-                    onSubmit={formik.handleSubmit}>
-                    <Form.Group className="mb-3 form-floating">
-                        <Form.Control
-                            value={formik.values.username}
-                            onChange={formik.handleChange}
-                            type="text"
-                            id="floatingLogin"
-                            name="username"
-                            placeholder="Введите логин" />
-                        <Form.Label htmlFor='floatingLogin'>Ваш логин</Form.Label>
-                        <Form.Text className="text-danger">
-                            {formik.errors.username && formik.touched.username ? formik.errors.username : null}
-                        </Form.Text>
-                    </Form.Group>
-                    <Form.Group className="mb-3 form-floating">
-                        <Form.Control
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                            type="password"
-                            id="floatingPassword"
-                            name="password"
-                            placeholder="Введите пароль" />
-                        <Form.Label htmlFor='floatingPassword'>Ваш пароль</Form.Label>
-                        <Form.Text className="text-danger">
-                            {formik.errors.password && formik.touched.password ? formik.errors.password : null}
-                        </Form.Text>
-                        <Form.Text className="text-danger">
-                            {errorMessage}
-                        </Form.Text>
-                    </Form.Group>
-                    <Button variant="primary" type="submit">
-                        Войти
-                    </Button>
-                </Form>
-                <p>Нет аккаунта? <Link to="/sign-up">Регистрация</Link></p>
+                <Row>
+                    <Col className='col-6'>
+                        <h1 className='text-center'>Войти</h1>
+                        <Form
+                            onSubmit={formik.handleSubmit}>
+                            <Form.Group className="mb-3 form-floating">
+                                <Form.Control
+                                    value={formik.values.username}
+                                    onChange={formik.handleChange}
+                                    type="text"
+                                    id="floatingLogin"
+                                    name="username"
+                                    placeholder="Введите логин"
+                                    className={formik.errors.username && formik.touched.username ? 'is-invalid' : ''} />
+                                <Form.Label htmlFor='floatingLogin'>Ваш логин</Form.Label>
+                                <Form.Text className="text-danger">
+                                    {formik.errors.username && formik.touched.username ? formik.errors.username : null}
+                                </Form.Text>
+                            </Form.Group>
+                            <Form.Group className="mb-3 form-floating">
+                                <Form.Control
+                                    value={formik.values.password}
+                                    onChange={formik.handleChange}
+                                    type="password"
+                                    id="floatingPassword"
+                                    name="password"
+                                    placeholder="Введите пароль"
+                                    className={formik.errors.password && formik.touched.password ? 'is-invalid' : ''} />
+                                <Form.Label htmlFor='floatingPassword'>Ваш пароль</Form.Label>
+                                <Form.Text className="text-danger">
+                                    {formik.errors.password && formik.touched.password ? formik.errors.password : null}
+                                </Form.Text>
+                                <Form.Text className="text-danger">
+                                    {errorMessage}
+                                </Form.Text>
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Войти
+                            </Button>
+                        </Form>
+                        <p>Нет аккаунта? <Link to="/sign-up">Регистрация</Link></p>
+                    </Col>
+                </Row>
             </Container>
 
         </>
