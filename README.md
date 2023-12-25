@@ -1,7 +1,5 @@
 ### tests and linter status:
 
-[![Actions Status](https://github.com/Rema04Dev/chat-js/workflows/hexlet-check/badge.svg)](https://github.com/Rema04Dev/chat-js/actions)
-
 ### [Demo](https://chat-js-production.up.railway.app/)
 
 <img height="200px" src="https://cdn2.hexlet.io/derivations/image/original/eyJpZCI6ImVhZmZhMmE3YjVjMDUwMGIwZWFjMWJhZDMzZmU4Y2M4LnBuZyIsInN0b3JhZ2UiOiJjYWNoZSJ9?signature=64cf2457b4236edb00bc7357051c6bfc466f26aaf9b3197831f004b769e07726">
@@ -32,7 +30,6 @@ Node.js version v.18.12.1 or later
 
 ```bash
 # clone this repository (ssh)
-git clone git@github.com:Rema04Dev/chat-js.git
 # install dependencies
 make install
 # run locally
