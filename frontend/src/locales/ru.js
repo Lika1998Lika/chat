@@ -35,6 +35,17 @@ const ru = {
             remove: 'Удалить',
             rename: 'Переименовать'
         },
+        messages: {
+            new: 'Новое сообщение',
+            input: 'Введите сообщение',
+            send: 'Отправить'
+        },
+        messagesCount: {
+            key_zero: '{{count}} сообщений',
+            key_one: '{{count}} сообщение',
+            key_few: '{{count}} сообщения',
+            key_many: '{{count}} сообщений',
+        },
         addModal: {
             name: 'Имя канала',
             cancel: 'Отменить',
@@ -64,6 +75,9 @@ const ru = {
             confirm: 'Уверены?',
             cancel: 'Отменить',
             remove: 'Удалить',
+        },
+        errors: {
+            network: 'Ошибка сети'
         }
     }
 };

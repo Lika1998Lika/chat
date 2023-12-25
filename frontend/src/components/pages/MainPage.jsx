@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Container, Row, Spinner } from 'react-bootstrap';
 import { ToastContainer } from 'react-toastify';
-import ChatHeader from './blocks/ChatHeader.jsx';
-import Channels from './blocks/Channels';
-import Messages from './blocks/Messages';
+import Channels from '../Channels/Channels';
+import Messages from '../Messages/Messages';
 import fetchData from '../../store/slices/fetchData';
 import useAuth from '../../hooks/useAuth.hook.js';
 import getModal from '../modals/index';
@@ -32,12 +31,12 @@ const MainPage = () => {
 
             } catch (e) {
                 setError('server error')
-                console.log(e)
+                console.log(error)
             }
 
         }
         getData()
-    }, [dispatch, getAuthHeaders]);
+    }, [dispatch, getAuthHeaders, error]);
 
     if (loading) {
         return (
