@@ -1,15 +1,17 @@
 import { Form, Button, Modal } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useSelector } from 'react-redux';
-import { io } from 'socket.io-client';
+import { useSelector, useDispatch } from 'react-redux';
+import { hideModal } from '../../store/slices/modalsSlice';
 import notification from '../../utils/notify';
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
+import useSocket from '../../hooks/useSocket.hook';
 
-const socket = io.connect('http://localhost:3000')
-const AddModal = ({ show, handleClose }) => {
-    const channels = useSelector(state => state.channels.channels)
+const AddModal = () => {
+    const channels = useSelector(state => state.channels.channels);
+    const dispatch = useDispatch();
     const { t } = useTranslation();
+    const { channel } = useSocket();
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -18,24 +20,23 @@ const AddModal = ({ show, handleClose }) => {
         validationSchema: Yup.object({
             name: Yup
                 .string()
-                .min(3, 'Название должно быть не менее 3 символов')
-                .max(20, 'Название не должно превышать 20 символов')
-                .notOneOf(channels.map((channel) => channel.name), `Канал уже существует`)
-                .required('Обязательное поле')
+                .min(3, t('addModal.validation.length'))
+                .notOneOf(channels.map((channel) => channel.name), 'addModal.validation.unique')
+                .required('addModal.validation.required')
         }),
 
         onSubmit: (values) => {
-            socket.emit('newChannel', values);
-            handleClose();
+            channel.add(values);
+            dispatch(hideModal());
             notification.add(t('addModal.success'))
         }
     })
 
     return (
         <>
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Добавить канал</Modal.Title>
+            <Modal show>
+                <Modal.Header closeButton onHide={() => dispatch(hideModal())}>
+                    <Modal.Title>{t('addModal.addChannel')}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={formik.handleSubmit}>
@@ -54,11 +55,11 @@ const AddModal = ({ show, handleClose }) => {
                             }
                         </Form.Group>
                         <div>
-                            <Button variant="secondary" onClick={handleClose}>
-                                Отменить
+                            <Button variant="secondary" onClick={() => dispatch(hideModal())}>
+                                {t('addModal.cancel')}
                             </Button>
-                            <Button variant="primary" type='submit' onClick={formik.handleSubmit}>
-                                Отправить
+                            <Button variant="primary" type='submit'>
+                                {t('addModal.send')}
                             </Button>
                         </div>
                     </Form>
