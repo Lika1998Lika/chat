@@ -1,23 +1,20 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Form, Button, Container, Row, Col,
+  Form, Button, Container, Row, Col, FormText,
 } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import AuthContext from '../contexts/AuthContext';
-import ErrorMessage from './ErrorMessage';
 import CustomSpinner from './skeletons/CustomSpinner';
 import routes from '../utils/routes';
-// import { useRollbar } from '@rollbar/react';
 
 const SignUpPage = () => {
   const { t } = useTranslation();
-  // const rollbar = useRollbar(); // <-- must have parent Provider
   const [signUpError, setSignUpError] = useState(null);
-  const [isSubmitting, SetisSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const { logIn } = useContext(AuthContext);
@@ -31,17 +28,17 @@ const SignUpPage = () => {
     validationSchema: Yup.object({
       username: Yup
         .string()
-        .min(3, t('signup.validation.usernameLength'))
-        .max(20, t('signup.validation.usernameLength'))
-        .required(t('signup.validation.required')),
+        .min(3, 'signup.validation.usernameLength')
+        .max(20, 'signup.validation.usernameLength')
+        .required('signup.validation.required'),
       password: Yup
         .string()
-        .min(6, t('signup.validation.passwordLength'))
-        .required(t('signup.validation.required')),
+        .min(6, 'signup.validation.passwordLength')
+        .required('signup.validation.required'),
       confirmPassword: Yup
         .string()
-        .oneOf([Yup.ref('password'), null], t('signup.validation.mustMatch'))
-        .required(t('signup.validation.required')),
+        .oneOf([Yup.ref('password'), null], 'signup.validation.mustMatch')
+        .required('signup.validation.required'),
     }),
 
     onSubmit: async (values) => {
@@ -51,16 +48,17 @@ const SignUpPage = () => {
       };
 
       try {
-        SetisSubmitting(true);
         const response = await axios.post(routes.signupPath(), userData);
         logIn({ ...response.data });
-        navigate('/');
+        navigate(routes.home);
       } catch (e) {
-        // rollbar.error('MESSAGE FROM ROLLBAR')
+        if (!e.isAxiosError) {
+          toast.error(t('errors.unknown'));
+          return;
+        }
         const { status } = e.response;
-        const message = status === 409 ? t('signup.validation.alreadyExists') : t('errors.network');
+        const message = status === 409 && 'signup.validation.alreadyExists';
         setSignUpError(message);
-        SetisSubmitting(false);
         throw e;
       }
     },
@@ -86,10 +84,10 @@ const SignUpPage = () => {
               />
               <Form.Label htmlFor="floatingLogin">{t('signup.username')}</Form.Label>
               {
-                                formik.errors.username
-                                && formik.touched.username
-                                && <ErrorMessage message={formik.errors.username} />
-                            }
+                formik.errors.username
+                && formik.touched.username
+                && <FormText className="feedback text-danger mt-3">{t(formik.errors.username)}</FormText>
+              }
             </Form.Group>
             <Form.Group className="mb-3 form-floating">
               <Form.Control
@@ -106,10 +104,10 @@ const SignUpPage = () => {
               <Form.Label htmlFor="floatingPassword">{t('signup.password')}</Form.Label>
               <Form.Text className="text-danger">
                 {
-                                    formik.errors.password
-                                    && formik.touched.password
-                                    && <ErrorMessage message={formik.errors.password} />
-                                }
+                  formik.errors.password
+                  && formik.touched.password
+                  && <FormText className="feedback text-danger mt-3">{t(formik.errors.password)}</FormText>
+                }
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3 form-floating">
@@ -120,19 +118,17 @@ const SignUpPage = () => {
                 id="floatingConfirmPassword"
                 name="confirmPassword"
                 autoComplete="off"
-                disabled={isSubmitting}
+                disabled={formik.isSubmitting}
                 placeholder={t('signup.confirmPassword')}
                 isInvalid={formik.errors.confirmPassword && formik.touched.confirmPassword}
               />
               <Form.Label htmlFor="floatingConfirmPassword">{t('signup.confirmPassword')}</Form.Label>
-              <Form.Text className="text-danger">
-                {
-                                    (formik.errors.confirmPassword
-                                        && formik.touched.confirmPassword
-                                        && <ErrorMessage message={formik.errors.confirmPassword} />)
-                                    || <ErrorMessage message={signUpError} />
-                                }
-              </Form.Text>
+              {
+                  (formik.errors.confirmPassword
+                    && formik.touched.confirmPassword
+                    && <FormText className="feedback text-danger mt-3">{t(formik.errors.confirmPassword)}</FormText>)
+                    || <FormText className="feedback text-danger mt-3">{t(signUpError)}</FormText>
+                }
             </Form.Group>
             <Button
               disabled={formik.isSubmitting}
@@ -145,8 +141,7 @@ const SignUpPage = () => {
           </Form>
           <p className="mt-3">
             {t('signup.hasAccount')}
-            {' '}
-            <Link to="/login">{t('login.title')}</Link>
+            <Link style={{ marginLeft: 5 }} to="/login">{t('login.title')}</Link>
           </p>
         </Col>
       </Row>

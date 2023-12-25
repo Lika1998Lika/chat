@@ -1,19 +1,19 @@
 import { useState, useContext } from 'react';
 import {
-  Form, Button, Container, Row, Col,
+  Form, Button, Container, Row, Col, FormText,
 } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import AuthContext from '../contexts/AuthContext';
-import ErrorMessage from './ErrorMessage';
 import CustomSpinner from './skeletons/CustomSpinner';
 import routes from '../utils/routes';
 
 const LoginPage = () => {
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [authError, setAuthError] = useState(null);
   const navigate = useNavigate();
   const { logIn } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -30,21 +30,26 @@ const LoginPage = () => {
       };
       try {
         const response = await axios.post(routes.loginPath(), userData);
-        logIn({ ...response.data });
+        logIn(response.data);
         navigate('/');
       } catch (e) {
-        const message = e.response.statusText === 'Unauthorized' ? t('login.validation.failed') : 'Неизвестная ошибка';
-        setErrorMessage(message);
+        if (!e.isAxiosError) {
+          toast.error(t('errors.unknown'));
+          return;
+        }
+        const { statusText } = e.response;
+        const message = statusText === 'Unauthorized' && 'login.validation.failed';
+        setAuthError(message);
         throw e;
       }
     },
     validationSchema: Yup.object({
       username: Yup
         .string()
-        .required(t('login.validation.required')),
+        .required('login.validation.required'),
       password: Yup
         .string()
-        .required(t('login.validation.required')),
+        .required('login.validation.required'),
     }),
   });
 
@@ -72,7 +77,7 @@ const LoginPage = () => {
               {
                 formik.errors.username
                 && formik.touched.username
-                && <ErrorMessage message={formik.errors.username} />
+                && <FormText className="feedback text-danger mt-3">{t(formik.errors.username)}</FormText>
               }
 
             </Form.Group>
@@ -89,14 +94,12 @@ const LoginPage = () => {
                 className={formik.errors.password && formik.touched.password ? 'is-invalid' : ''}
               />
               <Form.Label htmlFor="floatingPassword">{t('login.password')}</Form.Label>
-              <Form.Text className="text-danger">
-                {
+              {
                   formik.errors.password
                   && formik.touched.password
-                  && <ErrorMessage message={formik.errors.password} />
+                  && <FormText className="feedback text-danger mt-3">{t(formik.errors.password)}</FormText>
                 }
-              </Form.Text>
-              <ErrorMessage message={errorMessage} />
+              <FormText className="feedback text-danger mt-3">{t(authError)}</FormText>
             </Form.Group>
             <Button
               disabled={formik.isSubmitting}
@@ -109,7 +112,7 @@ const LoginPage = () => {
           </Form>
           <p className="mt-3">
             {t('login.hasAccount')}
-            <Link to="/signup">{t('signup.title')}</Link>
+            <Link style={{ marginLeft: 5 }} to={routes.signup}>{t('signup.title')}</Link>
           </p>
         </Col>
       </Row>

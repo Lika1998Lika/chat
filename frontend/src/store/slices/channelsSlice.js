@@ -2,9 +2,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import fetchData from './fetchData';
 
+const DEFAULT_CHANNEL_ID = 1;
+
 const initialState = {
   channels: [],
-  currentChannelId: 1,
+  currentChannelId: DEFAULT_CHANNEL_ID,
+  loading: false,
+  error: null,
 };
 
 const channelsSlice = createSlice({
@@ -22,7 +26,7 @@ const channelsSlice = createSlice({
       const { id } = action.payload;
       state.channels = state.channels.filter((channel) => channel.id !== id);
       if (id === state.currentChannelId) {
-        state.currentChannelId = 1;
+        state.currentChannelId = DEFAULT_CHANNEL_ID;
       }
     },
     renameChannel: (state, action) => {
@@ -33,10 +37,18 @@ const channelsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchData.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchData.fulfilled, (state, action) => {
         const { channels, currentChannelId } = action.payload;
         state.channels = channels;
         state.currentChannelId = currentChannelId;
+        state.loading = false;
+      })
+      .addCase(fetchData.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
       });
   },
 });

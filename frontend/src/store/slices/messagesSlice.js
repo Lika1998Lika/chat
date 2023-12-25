@@ -19,8 +19,6 @@ const messagesSlice = createSlice({
     builder
       .addCase(fetchData.fulfilled, (state, action) => {
         state.messages = action.payload.messages;
-        state.loadingStatus = 'succeed';
-        state.error = null;
       })
       .addCase(removeChannel, (state, action) => {
         const channelId = action.payload;
@@ -31,4 +29,4 @@ const messagesSlice = createSlice({
 });
 
 export default messagesSlice.reducer;
-export const { actions } = messagesSlice;
+export const { addMessage } = messagesSlice.actions;

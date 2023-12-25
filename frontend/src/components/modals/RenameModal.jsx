@@ -1,21 +1,23 @@
 import { useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, Button, Modal } from 'react-bootstrap';
+import {
+  Form, Button, Modal, FormText,
+} from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import leoProfanity from 'leo-profanity';
-import notification from '../../utils/notify';
+import { toast } from 'react-toastify';
 import { hideModal } from '../../store/slices/modalsSlice';
-import useSocket from '../../hooks/useSocket.hook';
-import ErrorMessage from '../ErrorMessage';
+import useApi from '../../hooks/useApi';
+import CustomSpinner from '../skeletons/CustomSpinner';
 
 const RenameModal = () => {
   const channels = useSelector((state) => state.channels.channels);
   const channelId = useSelector((state) => state.modals.channelId);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { renameChannel } = useSocket();
+  const chatApi = useApi();
   const inputEl = useRef();
 
   useEffect(() => {
@@ -30,16 +32,21 @@ const RenameModal = () => {
     validationSchema: Yup.object({
       name: Yup
         .string()
-        .min(3, t('renameModal.validation.length'))
-        .notOneOf(channels.map((channel) => channel.name), t('renameModal.validation.unique'))
-        .required(t('renameModal.validation.required')),
+        .min(3, 'renameModal.validation.length')
+        .notOneOf(channels.map((channel) => channel.name), 'renameModal.validation.unique')
+        .required('renameModal.validation.required'),
     }),
 
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const cleanedName = leoProfanity.clean(values.name);
-      renameChannel({ id: channelId, name: cleanedName });
-      dispatch(hideModal());
-      notification.rename(t('renameModal.success'));
+      try {
+        await chatApi.renameChannel({ id: channelId, name: cleanedName });
+        dispatch(hideModal());
+        toast.info(t('renameModal.success'), { icon: '✏️' });
+      } catch (err) {
+        console.error(err);
+        toast.error(t('errors.unknown'));
+      }
     },
   });
 
@@ -71,7 +78,7 @@ const RenameModal = () => {
             {
               formik.errors.name
               && formik.touched.name
-              && <ErrorMessage message={formik.errors.name} />
+              && <FormText className="feedback text-danger mt-3">{t(formik.errors.name)}</FormText>
             }
           </Form.Group>
           <div>
@@ -89,6 +96,7 @@ const RenameModal = () => {
               role="button"
               type="submit"
             >
+              {formik.isSubmitting ? <CustomSpinner size="sm" /> : null}
               {t('renameModal.send')}
             </Button>
           </div>

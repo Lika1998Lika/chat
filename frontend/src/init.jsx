@@ -1,16 +1,15 @@
 import i18next from 'i18next';
 import leoProfanity from 'leo-profanity';
 import { I18nextProvider, initReactI18next } from 'react-i18next';
-import { BrowserRouter } from 'react-router-dom';
 import { Provider as RollbarProvider, ErrorBoundary } from '@rollbar/react';
 import Rollbar from 'rollbar';
 import { Provider } from 'react-redux';
 import resources from './locales/index.js';
 import App from './components/App';
 import store from './store/store';
-import SocketProvider from './components/SocketProvider';
+import ApiProvider from './components/ApiProvider';
 
-const init = async () => {
+const init = async (socket) => {
   const i18n = i18next.createInstance();
 
   await i18n
@@ -25,7 +24,7 @@ const init = async () => {
   leoProfanity.add(leoProfanity.getDictionary('en'));
 
   const rollbarConfig = {
-    accessToken: 'REACT_APP_ROLLBAR',
+    accessToken: process.env.REACT_APP_ROLLBAR,
     environment: 'production',
   };
 
@@ -35,13 +34,11 @@ const init = async () => {
     <RollbarProvider config={rollbar}>
       <ErrorBoundary>
         <I18nextProvider i18n={i18n}>
-          <BrowserRouter>
-            <Provider store={store}>
-              <SocketProvider>
-                <App />
-              </SocketProvider>
-            </Provider>
-          </BrowserRouter>
+          <Provider store={store}>
+            <ApiProvider socket={socket}>
+              <App />
+            </ApiProvider>
+          </Provider>
         </I18nextProvider>
       </ErrorBoundary>
     </RollbarProvider>

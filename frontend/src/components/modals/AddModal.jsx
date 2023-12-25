@@ -1,20 +1,24 @@
 import { useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
-import { Form, Button, Modal } from 'react-bootstrap';
+import {
+  Form, Button, Modal, FormText,
+} from 'react-bootstrap';
 import * as Yup from 'yup';
 import leoProfanity from 'leo-profanity';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import { hideModal } from '../../store/slices/modalsSlice';
-import notification from '../../utils/notify';
-import useSocket from '../../hooks/useSocket.hook';
-import ErrorMessage from '../ErrorMessage';
+import * as channelsActions from '../../store/slices/channelsSlice';
+
+import useApi from '../../hooks/useApi';
+import CustomSpinner from '../skeletons/CustomSpinner';
 
 const AddModal = () => {
   const channels = useSelector((state) => state.channels.channels);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { addChannel } = useSocket();
+  const chatApi = useApi();
   const inputEl = useRef();
 
   useEffect(() => {
@@ -29,20 +33,27 @@ const AddModal = () => {
     validationSchema: Yup.object({
       name: Yup
         .string()
-        .min(3, t('addModal.validation.length'))
-        .notOneOf(channels.map((channel) => channel.name), t('addModal.validation.unique'))
-        .required(t('addModal.validation.required')),
+        .min(3, 'addModal.validation.length')
+        .notOneOf(channels.map((channel) => channel.name), 'addModal.validation.unique')
+        .required('addModal.validation.required'),
     }),
 
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const cleanedName = leoProfanity.clean(values.name);
       const channelData = {
         name: cleanedName,
         removable: true,
       };
-      addChannel(channelData);
-      dispatch(hideModal());
-      notification.add(t('addModal.success'));
+
+      try {
+        const response = await chatApi.addChannel(channelData);
+        dispatch(channelsActions.setCurrentChannelId(response.id));
+        dispatch(hideModal());
+        toast.success(t('addModal.success'), { icon: '🚀' });
+      } catch (err) {
+        console.error(err);
+        toast.error(t('errors.unknown'));
+      }
     },
   });
 
@@ -67,7 +78,7 @@ const AddModal = () => {
             {
               formik.errors.name
               && formik.touched.name
-              && <ErrorMessage message={formik.errors.name} />
+              && <FormText className="feedback text-danger mt-3">{t(formik.errors.name)}</FormText>
             }
             <Form.Label className="visually-hidden">
               {t('addModal.channelName')}
@@ -87,6 +98,9 @@ const AddModal = () => {
             variant="primary"
             type="submit"
           >
+            { formik.isSubmitting
+              ? <CustomSpinner size="sm" />
+              : null }
             {t('addModal.send')}
           </Button>
         </Form>
