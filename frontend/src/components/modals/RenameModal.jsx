@@ -1,6 +1,8 @@
 import { Form, Button, Modal } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import leoProfanity from 'leo-profanity';
+import { useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import notification from '../../utils/notify';
 import { useTranslation } from 'react-i18next'
@@ -12,11 +14,16 @@ const RenameModal = () => {
     const channelId = useSelector(state => state.modals.channelId);
     const dispatch = useDispatch();
     const { t } = useTranslation();
-    const { channel } = useSocket();
+    const { renameChannel } = useSocket();
+    const inputEl = useRef();
+
+    useEffect(() => {
+        inputEl.current.select();
+    }, []);
 
     const formik = useFormik({
         initialValues: {
-            name: ''
+            name: channels.find(channel => channel.id === channelId).name
         },
 
         validationSchema: Yup.object({
@@ -28,7 +35,8 @@ const RenameModal = () => {
         }),
 
         onSubmit: (values) => {
-            channel.rename({ id: channelId, ...values });
+            const cleanedName = leoProfanity.clean(values.name);
+            renameChannel({ id: channelId, name: cleanedName });
             dispatch(hideModal());
             notification.rename(t('renameModal.success'));
         }
@@ -48,6 +56,8 @@ const RenameModal = () => {
                             <Form.Control
                                 value={formik.values.name}
                                 onChange={formik.handleChange}
+                                ref={inputEl}
+                                aria-label={t('renameModal.name')}
                                 name="name"
                                 type="text"
                                 autoFocus
@@ -59,10 +69,14 @@ const RenameModal = () => {
                             }
                         </Form.Group>
                         <div>
-                            <Button variant="secondary" onClick={() => dispatch(hideModal())}>
+                            <Button
+                                className='m-1'
+                                variant="secondary" onClick={() => dispatch(hideModal())}>
                                 {t('renameModal.cancel')}
                             </Button>
-                            <Button variant="primary" type='submit'>
+                            <Button
+                                className='m-1'
+                                variant="primary" type='submit'>
                                 {t('renameModal.send')}
                             </Button>
                         </div>
