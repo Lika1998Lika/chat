@@ -1,10 +1,6 @@
 ### tests and linter status:
 
-### [Demo](https://chat-js-production.up.railway.app/)
-
-<img height="200px" src="https://cdn2.hexlet.io/derivations/image/original/eyJpZCI6ImVhZmZhMmE3YjVjMDUwMGIwZWFjMWJhZDMzZmU4Y2M4LnBuZyIsInN0b3JhZ2UiOiJjYWNoZSJ9?signature=64cf2457b4236edb00bc7357051c6bfc466f26aaf9b3197831f004b769e07726">
-
-<img height="200px" src="https://cdn2.hexlet.io/derivations/image/original/eyJpZCI6ImRlNDAxOGEyMGI4MjgxMzAyNThiY2MwOGUxNzIyOGRiLnBuZyIsInN0b3JhZ2UiOiJjYWNoZSJ9?signature=39baf6f294e34ea2a6f8b5248f6a2c73f3a4aca93d1b552c25bd7c3f875c5079">
+### [Demo](https://app-chat-avce.onrender.com/)
 
 # Chat-JS
 
@@ -30,6 +26,7 @@ Node.js version v.18.12.1 or later
 
 ```bash
 # clone this repository (ssh)
+https://github.com/Lika1998Lika/chat
 # install dependencies
 make install
 # run locally
