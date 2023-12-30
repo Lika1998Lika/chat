@@ -20,4 +20,4 @@ refresh:
 	npm i @hexlet/chat-server & make start
 
 lint:
-	npx eslint --ext js,jsx  --no-eslintrc --config .eslintrc.yml .
+	npx eslint --ext js,jsx --fix --no-eslintrc --config .eslintrc.yml .
