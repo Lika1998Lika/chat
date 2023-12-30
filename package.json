@@ -11,9 +11,6 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@hexlet/chat-server": "^1.1.6"
-  },
   "devDependencies": {
     "eslint": "^8.23.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -22,5 +19,8 @@
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.1",
     "eslint-plugin-react-hooks": "^4.6.0"
+  },
+  "dependencies": {
+    "@hexlet/chat-server": "^1.1.8"
   }
 }
