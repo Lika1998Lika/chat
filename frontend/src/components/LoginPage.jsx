@@ -37,8 +37,8 @@ const LoginPage = () => {
           toast.error(t('errors.unknown'));
           return;
         }
-        const { statusText } = e.response;
-        const message = statusText === 'Unauthorized' && 'login.validation.failed';
+        const { status } = e.response;
+        const message = status === 401 && 'login.validation.failed';
         setAuthError(message);
         throw e;
       }

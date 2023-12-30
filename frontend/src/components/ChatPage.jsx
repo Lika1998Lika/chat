@@ -54,6 +54,7 @@ const ChatPage = () => {
         <Spinner
           animation="border"
           variant="primary"
+          role="status"
           style={{ width: '5rem', height: '5rem' }}
           className="justify-self-center lg"
         />

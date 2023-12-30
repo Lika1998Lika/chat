@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
 import { useDispatch } from 'react-redux';
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import SocketContext from '../contexts/SocketContext';
 import * as messagesActions from '../store/slices/messagesSlice';
 import * as channelsActions from '../store/slices/channelsSlice';
@@ -18,12 +19,12 @@ const promisifySocket = (socket, event, data) => new Promise((resolve, reject) =
 const ApiProvider = ({ children, socket }) => {
   const dispatch = useDispatch();
 
-  const socketApi = useMemo(() => ({
+  const socketApi = {
     addMessage: (data) => promisifySocket(socket, 'newMessage', data),
     addChannel: (data) => promisifySocket(socket, 'newChannel', data),
     renameChannel: (data) => promisifySocket(socket, 'renameChannel', data),
     removeChannel: (data) => promisifySocket(socket, 'removeChannel', data),
-  }), [socket]);
+  };
 
   useEffect(() => {
     socket.on('newMessage', (message) => {
