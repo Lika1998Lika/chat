@@ -34,6 +34,7 @@ const AddModal = () => {
       name: Yup
         .string()
         .min(3, 'addModal.validation.length')
+        .max(20, 'addModal.validation.length')
         .notOneOf(channels.map((channel) => channel.name), 'addModal.validation.unique')
         .required('addModal.validation.required'),
     }),

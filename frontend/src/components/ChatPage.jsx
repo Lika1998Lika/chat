@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Row, Spinner } from 'react-bootstrap';
+import {
+  Col, Container, Row, Spinner,
+} from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import fetchData from '../store/slices/fetchData';
@@ -60,9 +62,13 @@ const ChatPage = () => {
   }
   return (
     <Container className="h-100 my-4 overflow-hidden rounded shadow">
-      <Row className="h-100 bg-white flex-md-row">
-        <Channels />
-        <Messages />
+      <Row className="row h-100 bg-white flex-md-row">
+        <Col className="col-4 col-md-2 border-end px-0 bg-light flex-column h-100 d-flex">
+          <Channels />
+        </Col>
+        <Col className="col p-0 h-100">
+          <Messages />
+        </Col>
       </Row>
       {renderModal(modalType)}
     </Container>
