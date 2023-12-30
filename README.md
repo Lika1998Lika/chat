@@ -1,4 +1,7 @@
 ### tests and linter status:
+[![Actions Status](https://github.com/Lika1998Lika/chat/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Lika1998Lika/chat/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/8f92e087b5f43b280c44/maintainability)](https://codeclimate.com/github/Lika1998Lika/chat/maintainability)
+[![Linter](https://github.com/Lika1998Lika/chat/actions/workflows/linter.yml/badge.svg)](https://github.com/Lika1998Lika/chat/actions)
 
 ### [Demo](https://app-chat-avce.onrender.com/)
 
