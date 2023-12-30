@@ -37,6 +37,7 @@ const LoginPage = () => {
           toast.error(t('errors.unknown'));
           return;
         }
+
         const { status } = e.response;
         const message = status === 401 && 'login.validation.failed';
         setAuthError(message);
